@@ -1,14 +1,24 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import LoginPage from './pages/LoginPage.jsx'
 import BillingPage from './pages/BillingPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
-import DashboardPage from './pages/DashboardPage.jsx'
 import ReceiptPage from './pages/ReceiptPage.jsx'
 import Toast from './components/Toast.jsx'
 import { getCurrentUser } from './lib/auth.js'
 import { loadMenu } from './hooks/useMenu.js'
 import { setupAutoSync } from './lib/sync.js'
+
+// Lazy-load the Dashboard (pulls in Recharts) so cashiers don't pay the bundle cost
+const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'))
+
+function DashboardFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-gray-400 text-sm">
+      Loading dashboard…
+    </div>
+  )
+}
 
 function RequireAuth({ children, adminOnly = false }) {
   const user = getCurrentUser()
@@ -42,7 +52,16 @@ export default function App() {
         <Route path="/" element={<RequireAuth><BillingPage /></RequireAuth>} />
         <Route path="/receipt" element={<RequireAuth><ReceiptPage /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth adminOnly><SettingsPage /></RequireAuth>} />
-        <Route path="/dashboard" element={<RequireAuth adminOnly><DashboardPage /></RequireAuth>} />
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth adminOnly>
+              <Suspense fallback={<DashboardFallback />}>
+                <DashboardPage />
+              </Suspense>
+            </RequireAuth>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toast />
