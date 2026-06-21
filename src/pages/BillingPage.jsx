@@ -1,55 +1,98 @@
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getCurrentUser, logout } from '../lib/auth.js'
-import { useMenu } from '../hooks/useMenu.js'
+import { useMenu, refreshMenu } from '../hooks/useMenu.js'
 import { CAFE } from '../config.js'
+import CategoryTabs from '../components/CategoryTabs.jsx'
+import ProductGrid from '../components/ProductGrid.jsx'
+import Cart from '../components/Cart.jsx'
 
 export default function BillingPage() {
   const user = getCurrentUser()
   const { data, loading, error } = useMenu()
+  const [activeCat, setActiveCat] = useState(null)
 
-  const cats = data?.categories?.filter(c => c.active).length || 0
-  const prods = data?.products?.filter(p => p.available).length || 0
+  const categories = useMemo(
+    () => (data?.categories || [])
+      .filter(c => c.active)
+      .sort((a, b) => (Number(a.display_order) || 0) - (Number(b.display_order) || 0)),
+    [data]
+  )
+
+  const products = useMemo(
+    () => (data?.products || []).filter(p => p.available),
+    [data]
+  )
+
+  useEffect(() => {
+    if (!activeCat && categories[0]) setActiveCat(categories[0].id)
+  }, [categories, activeCat])
+
+  const currentCat = categories.find(c => c.id === activeCat) || categories[0]
+  const filteredProducts = currentCat
+    ? products.filter(p => p.category_id === currentCat.id)
+    : []
 
   return (
-    <div className="min-h-screen flex flex-col bg-cream">
-      <header className="bg-brand-600 text-white px-3 py-3 flex items-center justify-between shadow">
-        <div>
-          <div className="font-bold text-lg">{CAFE.name}</div>
-          <div className="text-xs opacity-90">Hi, {user?.name}</div>
+    <div className="min-h-screen flex flex-col bg-cream pb-24">
+      <header className="bg-brand-600 text-white px-3 py-3 flex items-center justify-between shadow sticky top-0 z-30">
+        <div className="min-w-0">
+          <div className="font-bold text-base leading-tight">{CAFE.name}</div>
+          <div className="text-[11px] opacity-90 truncate">Hi, {user?.name}</div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {user?.role === 'admin' && (
             <>
-              <Link to="/dashboard" className="text-xs bg-white/20 px-3 py-1.5 rounded-lg">📊</Link>
-              <Link to="/settings"  className="text-xs bg-white/20 px-3 py-1.5 rounded-lg">⚙️</Link>
+              <Link to="/dashboard" title="Dashboard" className="text-base bg-white/20 px-2.5 py-1.5 rounded-lg">📊</Link>
+              <Link to="/settings"  title="Settings"  className="text-base bg-white/20 px-2.5 py-1.5 rounded-lg">⚙️</Link>
             </>
           )}
-          <button onClick={logout} className="text-xs bg-white/20 px-3 py-1.5 rounded-lg">Logout</button>
+          <button onClick={() => refreshMenu()} title="Refresh menu" className="text-base bg-white/20 px-2.5 py-1.5 rounded-lg">↻</button>
+          <button onClick={logout} className="text-xs bg-white/20 px-2.5 py-1.5 rounded-lg">Logout</button>
         </div>
       </header>
 
-      <main className="flex-1 p-6 flex items-center justify-center">
-        <div className="card p-6 max-w-md w-full text-center">
-          <div className="text-5xl mb-3">{loading && !data ? '⏳' : error ? '⚠️' : '🚧'}</div>
-          <h2 className="text-xl font-bold text-brand-800 mb-2">
-            {loading && !data ? 'Loading menu…' : error ? 'Connection issue' : 'Phase 1 — Settings live'}
-          </h2>
-          {error ? (
-            <p className="text-red-600 text-sm mb-3">{error}</p>
-          ) : (
-            <p className="text-gray-600 text-sm mb-4">
-              Menu synced from your Google Sheet — {cats} categor{cats === 1 ? 'y' : 'ies'}, {prods} product{prods === 1 ? '' : 's'}.
-              The billing tile grid comes in Phase 2.
-            </p>
-          )}
-          {user?.role === 'admin' && (
-            <div className="flex gap-2 justify-center mt-4">
-              <Link to="/settings" className="btn-primary flex-1">Manage Menu</Link>
-              <Link to="/dashboard" className="btn-secondary flex-1">Dashboard</Link>
-            </div>
-          )}
-        </div>
-      </main>
+      {loading && !data ? (
+        <CenterMsg icon="⏳" title="Loading menu…" />
+      ) : error && !data ? (
+        <CenterMsg icon="⚠️" title="Couldn't load menu" text={error} action={{ label: 'Retry', onClick: refreshMenu }} />
+      ) : categories.length === 0 ? (
+        <CenterMsg
+          icon="📁"
+          title="No categories yet"
+          text="Add a category and some products in Settings to start billing."
+          action={user?.role === 'admin' ? { label: 'Go to Settings', to: '/settings' } : null}
+        />
+      ) : (
+        <>
+          <CategoryTabs
+            categories={categories}
+            activeId={currentCat?.id}
+            onChange={setActiveCat}
+          />
+          <main className="flex-1">
+            <ProductGrid products={filteredProducts} categoryIcon={currentCat?.icon} />
+          </main>
+          <Cart />
+        </>
+      )}
+    </div>
+  )
+}
+
+function CenterMsg({ icon, title, text, action }) {
+  return (
+    <div className="flex-1 flex items-center justify-center p-6">
+      <div className="card p-6 max-w-sm w-full text-center">
+        <div className="text-5xl mb-2">{icon}</div>
+        <h2 className="text-lg font-bold text-brand-800 mb-1">{title}</h2>
+        {text && <p className="text-sm text-gray-500 mb-4">{text}</p>}
+        {action && (
+          action.to
+            ? <Link to={action.to} className="btn-primary inline-block">{action.label}</Link>
+            : <button onClick={action.onClick} className="btn-primary">{action.label}</button>
+        )}
+      </div>
     </div>
   )
 }

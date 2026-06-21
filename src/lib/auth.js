@@ -23,5 +23,6 @@ export function authenticate(staffList, staffId, pin) {
 
 export function logout() {
   localStorage.removeItem(KEY)
+  window.dispatchEvent(new Event('logout'))
   window.dispatchEvent(new Event('auth-change'))
 }

@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage.jsx'
 import BillingPage from './pages/BillingPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import ReceiptPage from './pages/ReceiptPage.jsx'
 import Toast from './components/Toast.jsx'
 import { getCurrentUser } from './lib/auth.js'
 import { loadMenu } from './hooks/useMenu.js'
@@ -37,6 +38,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<RequireAuth><BillingPage /></RequireAuth>} />
+        <Route path="/receipt" element={<RequireAuth><ReceiptPage /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth adminOnly><SettingsPage /></RequireAuth>} />
         <Route path="/dashboard" element={<RequireAuth adminOnly><DashboardPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
