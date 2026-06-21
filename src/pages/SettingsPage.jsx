@@ -1,16 +1,71 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CAFE } from '../config.js'
+import CategoryManager from '../components/CategoryManager.jsx'
+import ProductManager from '../components/ProductManager.jsx'
+import StaffManager from '../components/StaffManager.jsx'
+import { useMenu, refreshMenu } from '../hooks/useMenu.js'
+
+const TABS = [
+  { id: 'categories', label: 'Categories' },
+  { id: 'products',   label: 'Products'   },
+  { id: 'staff',      label: 'Staff'      }
+]
 
 export default function SettingsPage() {
+  const [tab, setTab] = useState('categories')
+  const { lastFetchedAt, loading } = useMenu()
+
   return (
-    <div className="min-h-screen p-4">
-      <Link to="/" className="text-sm text-brand-700">← Back to billing</Link>
-      <h1 className="text-2xl font-bold text-brand-800 mt-2 mb-4">Settings</h1>
-      <div className="card p-6 text-center">
-        <div className="text-3xl mb-2">⚙️</div>
-        <p className="text-gray-600 text-sm">Category, Product, Staff management — coming in Phase 1.</p>
-        <p className="text-xs text-gray-400 mt-3">Cafe: {CAFE.name}</p>
+    <div className="min-h-screen flex flex-col bg-cream">
+      <header className="bg-brand-600 text-white px-2 py-3 flex items-center gap-2 shadow sticky top-0 z-10">
+        <Link to="/" className="text-2xl px-2 py-1">←</Link>
+        <h1 className="font-bold text-lg flex-1">Settings</h1>
+        <button
+          onClick={() => refreshMenu()}
+          disabled={loading}
+          className="text-xs bg-white/20 px-3 py-1.5 rounded-lg disabled:opacity-50"
+          title="Refresh from Sheet"
+        >
+          {loading ? '…' : '↻'} Refresh
+        </button>
+      </header>
+
+      <div className="bg-white border-b sticky top-[56px] z-10">
+        <div className="flex">
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex-1 py-3 text-sm font-semibold transition ${
+                tab === t.id
+                  ? 'text-brand-700 border-b-2 border-brand-600'
+                  : 'text-gray-500 border-b-2 border-transparent'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
+
+      <main className="flex-1 p-4 pb-20">
+        {tab === 'categories' && <CategoryManager />}
+        {tab === 'products'   && <ProductManager />}
+        {tab === 'staff'      && <StaffManager />}
+      </main>
+
+      {lastFetchedAt && (
+        <footer className="text-center text-xs text-gray-400 py-3">
+          Last synced {timeAgo(lastFetchedAt)}
+        </footer>
+      )}
     </div>
   )
+}
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000)
+  if (s < 60) return 'just now'
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`
+  return `${Math.floor(s / 3600)}h ago`
 }

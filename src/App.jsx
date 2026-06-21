@@ -4,7 +4,9 @@ import LoginPage from './pages/LoginPage.jsx'
 import BillingPage from './pages/BillingPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import Toast from './components/Toast.jsx'
 import { getCurrentUser } from './lib/auth.js'
+import { loadMenu } from './hooks/useMenu.js'
 
 function RequireAuth({ children, adminOnly = false }) {
   const user = getCurrentUser()
@@ -17,22 +19,29 @@ export default function App() {
   const [, forceRender] = useState(0)
 
   useEffect(() => {
-    const onStorage = () => forceRender(n => n + 1)
-    window.addEventListener('storage', onStorage)
-    window.addEventListener('auth-change', onStorage)
+    loadMenu()
+    const refresh = () => forceRender(n => n + 1)
+    const onOnline = () => loadMenu()
+    window.addEventListener('storage', refresh)
+    window.addEventListener('auth-change', refresh)
+    window.addEventListener('online', onOnline)
     return () => {
-      window.removeEventListener('storage', onStorage)
-      window.removeEventListener('auth-change', onStorage)
+      window.removeEventListener('storage', refresh)
+      window.removeEventListener('auth-change', refresh)
+      window.removeEventListener('online', onOnline)
     }
   }, [])
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/" element={<RequireAuth><BillingPage /></RequireAuth>} />
-      <Route path="/settings" element={<RequireAuth adminOnly><SettingsPage /></RequireAuth>} />
-      <Route path="/dashboard" element={<RequireAuth adminOnly><DashboardPage /></RequireAuth>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<RequireAuth><BillingPage /></RequireAuth>} />
+        <Route path="/settings" element={<RequireAuth adminOnly><SettingsPage /></RequireAuth>} />
+        <Route path="/dashboard" element={<RequireAuth adminOnly><DashboardPage /></RequireAuth>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toast />
+    </>
   )
 }

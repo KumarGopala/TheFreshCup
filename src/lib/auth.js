@@ -1,12 +1,5 @@
 const KEY = 'fresh-cup:auth'
 
-// Phase 0 stub: hard-coded staff list. Phase 1 will swap to IndexedDB + Sheet sync.
-export const SEED_STAFF = [
-  { id: 'admin', name: 'Owner', pin: '1234', role: 'admin', active: true },
-  { id: 'staff-1', name: 'Ramesh', pin: '1111', role: 'cashier', active: true },
-  { id: 'staff-2', name: 'Suresh', pin: '2222', role: 'cashier', active: true }
-]
-
 export function getCurrentUser() {
   try {
     const raw = localStorage.getItem(KEY)
@@ -16,10 +9,12 @@ export function getCurrentUser() {
   }
 }
 
-export function login(staffId, pin) {
-  const staff = SEED_STAFF.find(s => s.id === staffId && s.active)
+// Authenticate against the live Staff list from useMenu's cache.
+// Caller passes the staff array (so we don't import the hook here and create cycles).
+export function authenticate(staffList, staffId, pin) {
+  const staff = (staffList || []).find(s => s.id === staffId && s.active)
   if (!staff) return { ok: false, error: 'Staff not found' }
-  if (staff.pin !== pin) return { ok: false, error: 'Wrong PIN' }
+  if (String(staff.pin) !== String(pin)) return { ok: false, error: 'Wrong PIN' }
   const user = { id: staff.id, name: staff.name, role: staff.role }
   localStorage.setItem(KEY, JSON.stringify(user))
   window.dispatchEvent(new Event('auth-change'))
