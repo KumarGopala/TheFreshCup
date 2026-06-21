@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-cream text-gray-900 font-sans antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button {
+  @apply select-none;
+  -webkit-touch-callout: none;
+}
+
+input, button {
+  font-family: inherit;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-600 active:bg-brand-700 text-white font-semibold py-3 px-6 rounded-xl shadow-sm active:scale-[0.98] transition;
+  }
+  .btn-secondary {
+    @apply bg-white border border-gray-200 active:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-xl shadow-sm active:scale-[0.98] transition;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100;
+  }
+  .input {
+    @apply w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+  }
+}
