@@ -8,6 +8,7 @@ import ReceiptPage from './pages/ReceiptPage.jsx'
 import Toast from './components/Toast.jsx'
 import { getCurrentUser } from './lib/auth.js'
 import { loadMenu } from './hooks/useMenu.js'
+import { setupAutoSync } from './lib/sync.js'
 
 function RequireAuth({ children, adminOnly = false }) {
   const user = getCurrentUser()
@@ -21,6 +22,7 @@ export default function App() {
 
   useEffect(() => {
     loadMenu()
+    setupAutoSync()
     const refresh = () => forceRender(n => n + 1)
     const onOnline = () => loadMenu()
     window.addEventListener('storage', refresh)

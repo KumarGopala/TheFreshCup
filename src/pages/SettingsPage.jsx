@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import CategoryManager from '../components/CategoryManager.jsx'
 import ProductManager from '../components/ProductManager.jsx'
 import StaffManager from '../components/StaffManager.jsx'
+import SyncIndicator, { SyncBanner } from '../components/SyncIndicator.jsx'
 import { useMenu, refreshMenu } from '../hooks/useMenu.js'
 
 const TABS = [
@@ -20,6 +21,7 @@ export default function SettingsPage() {
       <header className="bg-brand-600 text-white px-2 py-3 flex items-center gap-2 shadow sticky top-0 z-10">
         <Link to="/" className="text-2xl px-2 py-1">←</Link>
         <h1 className="font-bold text-lg flex-1">Settings</h1>
+        <SyncIndicator />
         <button
           onClick={() => refreshMenu()}
           disabled={loading}
@@ -29,6 +31,8 @@ export default function SettingsPage() {
           {loading ? '…' : '↻'} Refresh
         </button>
       </header>
+
+      <SyncBanner />
 
       <div className="bg-white border-b sticky top-[56px] z-10">
         <div className="flex">

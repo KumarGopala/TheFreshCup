@@ -1,5 +1,6 @@
 import { api, ApiError } from './api.js'
 import { queueBill } from './db.js'
+import { refreshPendingCount, syncPendingBills } from './sync.js'
 
 export function buildBill({ items, paymentMode, staffId }) {
   const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0)
@@ -30,12 +31,15 @@ export function buildBill({ items, paymentMode, staffId }) {
 export async function saveBill({ bill, items }) {
   try {
     await api.saveBill(bill, items)
+    // Good moment to drain any older queued bills too
+    syncPendingBills()
     return { ok: true, mode: 'online', bill, items }
   } catch (err) {
     const isNetwork =
       err instanceof ApiError && (err.code === 'NETWORK' || err.code === 'HTTP')
     if (isNetwork || !navigator.onLine) {
       await queueBill({ ...bill, items, queued_at: Date.now() })
+      await refreshPendingCount()
       return { ok: true, mode: 'queued', bill, items }
     }
     throw err
