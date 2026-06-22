@@ -43,12 +43,14 @@ cafe-billing-app/
 ## Build phases
 
 - [x] **Phase 0:** Scaffold, login, theme, routing, PWA setup, Apps Script backend template
-- [ ] **Phase 1:** Settings — category/product/staff CRUD (writes to Sheet)
-- [ ] **Phase 2:** Billing screen — category tabs, product image grid, cart, confirm
-- [ ] **Phase 3:** Receipt — canvas image, WhatsApp share, print
-- [ ] **Phase 4:** Offline mode — service worker, IndexedDB cache, sync queue, indicator
-- [ ] **Phase 5:** Dashboard — day/week/month sales, top products, by-staff
-- [ ] **Phase 6:** Polish, real icons, final deploy
+- [x] **Phase 1:** Settings — category/product/staff CRUD wired to Sheet
+- [x] **Phase 2:** Billing screen — category tabs, product image grid, cart, confirm
+- [x] **Phase 3:** Receipt — canvas PNG, WhatsApp share via Web Share API, browser print
+- [x] **Phase 4:** Offline mode — service worker, IndexedDB queue, auto-sync, sync indicator
+- [x] **Phase 5:** Dashboard — Today/Week/Month/Custom, charts, top products, by-staff
+- [ ] **Phase 6:** Polish — real icons, install prompt, in-app settings page, final deploy
+
+See [PROJECT.md](./PROJECT.md) for the complete end-to-end project context (BRD, architecture, file map, decisions, troubleshooting).
 
 ## Test users (Phase 0 stub)
 
