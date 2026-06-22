@@ -1,23 +1,21 @@
 import { useState } from 'react'
 import { useLocation, useNavigate, Navigate } from 'react-router-dom'
-import { CAFE } from '../config.js'
 import { formatDateTime } from '../lib/bills.js'
 import { renderReceiptImage, shortId, prettyPayment } from '../lib/receipt.js'
-import { useMenu } from '../hooks/useMenu.js'
+import { useCafe } from '../hooks/useCafe.js'
 import { toast } from '../components/Toast.jsx'
 
 export default function ReceiptPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { data } = useMenu()
+  const cafe = useCafe()
   const state = location.state
 
   if (!state || !state.bill) return <Navigate to="/" replace />
 
   const { bill, items, staffName, queued } = state
-  const settings = arrayToObject(data?.settings)
-  const cafeName = settings.cafe_name || CAFE.name
-  const footer = settings.receipt_footer || CAFE.receiptFooter
+  const cafeName = cafe.name
+  const footer = cafe.receiptFooter
 
   const [busy, setBusy] = useState(false)
 
@@ -139,14 +137,6 @@ export default function ReceiptPage() {
       </div>
     </div>
   )
-}
-
-function arrayToObject(settings) {
-  if (!settings) return {}
-  if (Array.isArray(settings)) {
-    return Object.fromEntries(settings.map(r => [r.key, r.value]))
-  }
-  return settings
 }
 
 function textReceipt({ bill, items, staffName, cafeName, footer }) {

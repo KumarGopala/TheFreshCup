@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom'
 import CategoryManager from '../components/CategoryManager.jsx'
 import ProductManager from '../components/ProductManager.jsx'
 import StaffManager from '../components/StaffManager.jsx'
+import CafeSettings from '../components/CafeSettings.jsx'
 import SyncIndicator, { SyncBanner } from '../components/SyncIndicator.jsx'
 import { useMenu, refreshMenu } from '../hooks/useMenu.js'
 
 const TABS = [
   { id: 'categories', label: 'Categories' },
   { id: 'products',   label: 'Products'   },
-  { id: 'staff',      label: 'Staff'      }
+  { id: 'staff',      label: 'Staff'      },
+  { id: 'cafe',       label: 'Cafe'       }
 ]
 
 export default function SettingsPage() {
@@ -56,6 +58,7 @@ export default function SettingsPage() {
         {tab === 'categories' && <CategoryManager />}
         {tab === 'products'   && <ProductManager />}
         {tab === 'staff'      && <StaffManager />}
+        {tab === 'cafe'       && <CafeSettings />}
       </main>
 
       {lastFetchedAt && (

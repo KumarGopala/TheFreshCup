@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authenticate, getCurrentUser } from '../lib/auth.js'
 import { useMenu } from '../hooks/useMenu.js'
-import { CAFE, IS_API_CONFIGURED } from '../config.js'
+import { useCafe } from '../hooks/useCafe.js'
+import { IS_API_CONFIGURED } from '../config.js'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const { data, loading, error } = useMenu()
+  const cafe = useCafe()
   const activeStaff = (data?.staff || []).filter(s => s.active)
 
   const [selectedStaff, setSelectedStaff] = useState('')
@@ -44,11 +46,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-brand-50 to-cream">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-brand-600 text-white text-4xl shadow-lg mb-4">
-            ☕
-          </div>
-          <h1 className="text-3xl font-bold text-brand-800">{CAFE.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">{CAFE.tagline}</p>
+          <img src="/icons/icon-512.png" alt={cafe.name} className="w-24 h-24 mx-auto mb-3 rounded-3xl shadow-lg object-contain bg-white" />
+          <h1 className="text-3xl font-bold text-brand-800">{cafe.name}</h1>
+          <p className="text-sm text-gray-500 mt-1">{cafe.tagline}</p>
         </div>
 
         <div className="card p-6">

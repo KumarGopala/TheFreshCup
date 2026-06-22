@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getCurrentUser, logout } from '../lib/auth.js'
 import { useMenu, refreshMenu } from '../hooks/useMenu.js'
-import { CAFE } from '../config.js'
+import { useCafe } from '../hooks/useCafe.js'
 import CategoryTabs from '../components/CategoryTabs.jsx'
 import ProductGrid from '../components/ProductGrid.jsx'
 import Cart from '../components/Cart.jsx'
@@ -11,6 +11,7 @@ import SyncIndicator from '../components/SyncIndicator.jsx'
 export default function BillingPage() {
   const user = getCurrentUser()
   const { data, loading, error } = useMenu()
+  const cafe = useCafe()
   const [activeCat, setActiveCat] = useState(null)
 
   const categories = useMemo(
@@ -39,7 +40,7 @@ export default function BillingPage() {
       <header className="bg-brand-600 text-white px-3 py-3 flex items-center justify-between shadow sticky top-0 z-30">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <div className="font-bold text-base leading-tight">{CAFE.name}</div>
+            <div className="font-bold text-base leading-tight">{cafe.name}</div>
             <SyncIndicator />
           </div>
           <div className="text-[11px] opacity-90 truncate">Hi, {user?.name}</div>

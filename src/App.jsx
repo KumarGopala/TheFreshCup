@@ -5,6 +5,7 @@ import BillingPage from './pages/BillingPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import ReceiptPage from './pages/ReceiptPage.jsx'
 import Toast from './components/Toast.jsx'
+import InstallPrompt from './components/InstallPrompt.jsx'
 import { getCurrentUser } from './lib/auth.js'
 import { loadMenu } from './hooks/useMenu.js'
 import { setupAutoSync } from './lib/sync.js'
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toast />
+      <InstallPrompt />
     </>
   )
 }
